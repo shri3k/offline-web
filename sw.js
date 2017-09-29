@@ -1,4 +1,4 @@
-const CACHE_NAME = 'strat-v1';
+const CACHE_NAME = 'strat-v2';
 self.addEventListener('install', function(event) {
   const assets = ['/', '/index.html', '/app.js', '/threatLogo.png'];
 
@@ -6,6 +6,11 @@ self.addEventListener('install', function(event) {
     return cache.addAll(assets);
   });
   event.waitUntil(cacheAssets);
+});
+
+self.addEventListener('activate', function(event) {
+  event.waitUntil(caches.delete('strat-v1'));
+  // event.skipWaiting();
 });
 
 self.addEventListener('fetch', function(event) {
