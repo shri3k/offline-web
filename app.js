@@ -11,7 +11,7 @@
 
   // Regular app logic
   let switchText = true;
-  const texts = ['hello world', 'good bye'];
+  const texts = ['Stratfor world', 'hello again'];
   document.querySelector('h1').addEventListener('click', function(e) {
     this.textContent = texts[Number(switchText)];
     switchText = !switchText;
