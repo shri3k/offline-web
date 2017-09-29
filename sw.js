@@ -1,29 +1,41 @@
+const CACHE_NAME = 'strat-v1';
 self.addEventListener('install', function(event) {
-  const assets = ['/app.js', '/threatLogo.png'];
+  const assets = ['/', '/index.html', '/app.js', '/threatLogo.png'];
 
-  const cacheAssets = caches.open('strat-v1').then(function(cache) {
-    cache.addAll(assets);
+  const cacheAssets = caches.open(CACHE_NAME).then(function(cache) {
+    return cache.addAll(assets);
   });
   event.waitUntil(cacheAssets);
 });
 
-// self.addEventListener('fetch', function(event) {
-//   console.log('Request', event.request);
-//
-//   const jsRegex = /.*\.js/;
-//   if (jsRegex.test(event.request.url)) {
-//     const injectScript = "alert('hello')";
-//     const resp = new Response(injectScript, {
-//       headers: {
-//         'Content-Type': 'application/javascript'
-//       }
-//     });
-//     event.respondWith(resp);
-//   }
+self.addEventListener('fetch', function(event) {
+  console.log('Request', event.request.url);
 
-// const imgRegex = /.*\.jpg/;
-// if (imgRegex.test(event.request.url)) {
-//   const oldLogo = '/threatLogo.png';
-//   event.respondWith(fetch(oldLogo));
-// }
-// });
+  const fromCache = caches.open(CACHE_NAME).then(function(cache) {
+    return caches
+      .match(event.request)
+      .then(function(resp) {
+        if (resp) {
+          console.log('Fetching from cache', resp.url);
+          return resp;
+        }
+        return fetchFromServer(event.request);
+      })
+      .catch(err => console.error('failed on match', err));
+  });
+
+  event.respondWith(fromCache);
+});
+
+function fetchFromServer(url) {
+  return fetch(url)
+    .then(function(resp) {
+      if (!resp.ok) {
+        throw Error(resp.statusText);
+      }
+      return resp;
+    })
+    .catch(function(err) {
+      console.error('failed to fetch', err);
+    });
+}
