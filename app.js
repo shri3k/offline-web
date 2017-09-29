@@ -6,7 +6,7 @@
       console.log('Registered', registration);
     })
     .catch(function(err) {
-      consle.error('failed', err);
+      conosle.error('failed', err);
     });
 
   // Regular app logic
